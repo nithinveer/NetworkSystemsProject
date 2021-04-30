@@ -2,12 +2,12 @@ import cryptography
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
-from flask import Flask, request,send_file, send_from_directory, safe_join, abort
+from flask import Flask, request,send_file, send_from_directory, safe_join, abort,jsonify
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
-import os
+import os, json
 app = Flask(__name__)
 
 @app.route("/generateKeys",methods=['POST'])
@@ -49,13 +49,25 @@ def generateKeys():
 
 @app.route("/receivePubKey",methods=['POST'])
 def receivePubKey():
-    data = request.get_json()
-    decrypt_message(data['msg'])
+    # try:
+    data = request.data
+
+    my_json = data.decode('utf8').replace("'", '"')
+    print(my_json)
+    data = json.loads(my_json)
+
+    print("Format is ")
+    print(type(data))
+    decrypt_message(data)
+    return "TRUE"
+    # except  Exception as ex:
+    #     print(ex)
+    #     return "True"
 
 
 def decrypt_message(encypted_msg):
     orginal_msg = []
-    for each_chunk in encypted_msg:
+    for each_chunk in encypted_msg['msg']:
         with open('pr1-{}.pem'.format('Nithin'), "rb") as key_file:
             private_key = serialization.load_pem_private_key(
                 key_file.read(),
@@ -63,16 +75,22 @@ def decrypt_message(encypted_msg):
                 backend=default_backend()
             )
             original_message = private_key.decrypt(
-                each_chunk,
+                bytes.fromhex(each_chunk),
                 padding.OAEP(
                     mgf=padding.MGF1(algorithm=hashes.SHA256()),
                     algorithm=hashes.SHA256(),
                     label=None
                 )
             )
-        orginal_msg.append(original_message)
-        print(original_message)
+            orginal_msg.append(original_message)
+    # print(original_message)
     print(orginal_msg)
+    f = open('pu2-{}.pem'.format('Nithin'), 'w+b')
+    for each_ in orginal_msg:
+        f.write(each_)
+    # binary_format = bytearray(orginal_msg)
+    # f.write(orginal_msg)
+    f.close()
 
 
 def generate_initial_key(_id):

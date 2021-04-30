@@ -5,9 +5,8 @@ import requests
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 import json
-post_request_headers = {
-    "Content-Type": "application/json"
-    }
+post_request_headers = {"Content-Type": "application/json"}
+post_octect_headers = {'Content-Type': 'application/octet-stream'}
 def get_keys():
     request_payload= '{"_id":"Nithin"}'
     # request_payload['_id'] = 'Nithin'
@@ -29,29 +28,34 @@ def transmit_publicKey():
         )
     CHUNK_SIZE = 150
     msg_contents= []
-    with open('pu2-{}.pem'.format('nithin')) as f:
-        chunk = f.read(CHUNK_SIZE)
-        while chunk:
-            msg_contents.append(chunk)
-            chunk = f.read(CHUNK_SIZE)
+    f = open('pu2-{}.pem'.format('nithin'), 'rb')
+    while True:
+        piece = f.read(CHUNK_SIZE)
+        if not piece:
+            break
+        msg_contents.append(piece)
+    f.close()
+
     print(msg_contents)
     encrypted_contents = []
     for each_chunk in msg_contents:
         print(type(each_chunk))
         encrypted = public_key.encrypt(
-            each_chunk.encode(),
+            each_chunk,
             padding.OAEP(
                 mgf=padding.MGF1(algorithm=hashes.SHA256()),
                 algorithm=hashes.SHA256(),
                 label=None
             )
         )
-        encrypted_contents.append(encrypted.decode())
-    print(encrypted_contents)
+        print(type(encrypted))
+        encrypted_contents.append(encrypted.hex())
+    print((encrypted_contents))
     request_payload = {}
     request_payload['msg'] = encrypted_contents
+    print(request_payload)
     response = requests.post(url='http://127.0.0.1:5000/receivePubKey', data=json.dumps(request_payload),
-                             headers=post_request_headers)
+                             headers=post_octect_headers)
 
 def create_keys(_id):
 
