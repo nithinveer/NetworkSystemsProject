@@ -1,5 +1,6 @@
 import cryptography
 from cryptography.hazmat.backends import default_backend
+from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from flask import Flask, request,send_file, send_from_directory, safe_join, abort,jsonify
@@ -10,9 +11,23 @@ from cryptography.hazmat.primitives.asymmetric import padding
 import os, json
 app = Flask(__name__)
 
+
+@app.route("/shareData",methods=['POST'])
+def shareData():
+    data = request.data
+    print(type(data), data)
+    file = open('nithin.key', 'rb')  # Open the file as wb to read bytes
+    key = file.read()  # The key will be type bytes
+    file.close()
+    f = Fernet(key)
+    decrypted = f.decrypt(data)
+    print(decrypted.decode())
+    return "Hello World!"
+
+
+
 @app.route("/generateKeys",methods=['POST'])
 def generateKeys():
-    print('Hi')
     try:
         data = request.get_json()
         print(data['_id'])
@@ -59,11 +74,58 @@ def receivePubKey():
     print("Format is ")
     print(type(data))
     decrypt_message(data)
-    return "TRUE"
+    symetricKey_generation()
+    response_payload = transmit_symetricKey()
+    return jsonify(response_payload), 200
+
+    # return "TRUE"
     # except  Exception as ex:
     #     print(ex)
     #     return "True"
 
+
+
+def symetricKey_generation():
+    key = Fernet.generate_key()
+    file = open('nithin.key', 'wb')  # Open the file as wb to write bytes
+    file.write(key)  # The key is type bytes still
+    file.close()
+
+def transmit_symetricKey():
+    with open('pu2-{}.pem'.format('nithin'), "rb") as key_file:
+        public_key = serialization.load_pem_public_key(
+            key_file.read(),
+            backend=default_backend()
+        )
+    CHUNK_SIZE = 150
+    msg_contents= []
+    f = open('{}.key'.format('nithin'), 'rb')
+    while True:
+        piece = f.read(CHUNK_SIZE)
+        if not piece:
+            break
+        msg_contents.append(piece)
+    f.close()
+
+    print(msg_contents)
+    encrypted_contents = []
+    for each_chunk in msg_contents:
+        print(type(each_chunk))
+        encrypted = public_key.encrypt(
+            each_chunk,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        print(type(encrypted))
+        encrypted_contents.append(encrypted.hex())
+    print((encrypted_contents))
+    request_payload = {}
+    request_payload['msg'] = encrypted_contents
+
+    return request_payload
 
 def decrypt_message(encypted_msg):
     orginal_msg = []

@@ -4,6 +4,8 @@ from cryptography.hazmat.primitives import serialization
 import requests
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.fernet import Fernet
+
 import json
 post_request_headers = {"Content-Type": "application/json"}
 post_octect_headers = {'Content-Type': 'application/octet-stream'}
@@ -55,7 +57,37 @@ def transmit_publicKey():
     request_payload['msg'] = encrypted_contents
     print(request_payload)
     response = requests.post(url='http://127.0.0.1:5000/receivePubKey', data=json.dumps(request_payload),
-                             headers=post_octect_headers)
+                             headers=post_octect_headers).json()
+    print("Response is ")
+    print(response)
+    decrypt_message(response['msg'])
+
+def decrypt_message(encypted_msg):
+    orginal_msg = []
+    for each_chunk in encypted_msg:
+        with open('pr2-{}.pem'.format('Nithin'), "rb") as key_file:
+            private_key = serialization.load_pem_private_key(
+                key_file.read(),
+                password=None,
+                backend=default_backend()
+            )
+            original_message = private_key.decrypt(
+                bytes.fromhex(each_chunk),
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
+            )
+            orginal_msg.append(original_message)
+    # print(original_message)
+    print(orginal_msg)
+    f = open('{}.key'.format('nithin'), 'w+b')
+    for each_ in orginal_msg:
+        f.write(each_)
+    # binary_format = bytearray(orginal_msg)
+    # f.write(orginal_msg)
+    f.close()
 
 def create_keys(_id):
 
@@ -83,7 +115,18 @@ def create_keys(_id):
     with open('pu2-{}.pem'.format(_id), 'wb') as f:
         f.write(pem)
     
-    
+
+def send_msg():
+    file = open('nithin.key', 'rb')  # Open the file as wb to read bytes
+    key = file.read()  # The key will be type bytes
+    file.close()
+    message = "I am from CU Boulder".encode()
+
+    f = Fernet(key)
+    encrypted = f.encrypt(message)
+    response = requests.post(url='http://127.0.0.1:5000/shareData', data=encrypted,
+                             headers=post_octect_headers)
+
 if __name__ == '__main__':
-    get_keys()
-    
+    # get_keys()
+    send_msg()
