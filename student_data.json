@@ -1,0 +1,29 @@
+{
+	"student_details": [
+		{
+			"student_id": "12345",
+			"name": "Sitesh Ranjan",
+			"email": "sitesh.ranjan@colorado.edu",
+			"major": "Computer Science"
+		},
+		{
+			"student_id": "23456",
+			"name": "Srinivas Baskar",
+			"email": "srinivas.baskar@colorado.edu",
+			"major": "Computer Science"
+		},
+		{
+			"student_id": "34567",
+			"name": "Nithin Kankati",
+			"email": "nithin.kankati@colorado.edu",
+			"major": "Computer Science"
+		},
+		{
+			"student_id": "45678",
+			"name": "Chanheum Park",
+			"email": "chpa8095@colorado.edu",
+			"major": "Computer Science"
+		}
+
+	]
+}
