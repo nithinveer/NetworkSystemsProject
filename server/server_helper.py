@@ -3,16 +3,28 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.fernet import Fernet
 import server_config as cfg
+import os
 
 def redis_to_file(store, key):
 
     content = store.get(key)
+
+    curr_directory = os.getcwd()
+    if not os.path.exists(cfg.keys_folder):
+        dirPath = os.path.join(curr_directory, cfg.keys_folder)
+        os.mkdir(dirPath)
+
     print("from store:\n", content)
     f = open('{}/{}'.format(cfg.keys_folder, key), "wb")
     f.write(content)
     f.close()
 
 def file_to_redis(store, key):
+
+    curr_directory = os.getcwd()
+    if not os.path.exists(cfg.keys_folder):
+        dirPath = os.path.join(curr_directory, cfg.keys_folder)
+        os.mkdir(dirPath)
 
     f = open('{}/{}'.format(cfg.keys_folder, key), "rb")
     content = f.read()
