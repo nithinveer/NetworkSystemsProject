@@ -5,6 +5,7 @@ import client_config as cfg
 import client_helper as helper
 import os.path
 import uuid
+import json
 
 def send_msg(_id, data):
     # Check the Keys Directory
@@ -28,9 +29,13 @@ def send_msg(_id, data):
                              headers=cfg.post_octect_headers)
     print(response)
 
+    decrypted = f.decrypt(response.text.encode())
+    res = json.loads(decrypted.decode())
+
+    print(res)
 
 if __name__ == '__main__':
     current_machine_id = str(uuid.uuid4())
     data = {}
-    data['msg'] = "I am from CU Boulder - Colorado"
+    data['msg'] = "23456"
     send_msg(current_machine_id, data)

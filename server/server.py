@@ -13,6 +13,8 @@ import server_config as cfg
 import sys
 
 app = Flask(__name__)
+f = open('student_data.json',)
+student_data = json.load(f)
 
 @app.route('/')
 def home():
@@ -31,9 +33,20 @@ def shareData():
     file.close()
     f = Fernet(key)
     decrypted = f.decrypt(data)
-    print(decrypted.decode())
-    return "Hello World!"
+    arg = decrypted.decode()
 
+    message = None
+
+    for i in student_data['student_details']:
+        if i['student_id'] == arg:
+            message = i
+    
+    if message == None:
+        message = jsonify({'name': 'NA', 'major': 'NA', 'email': 'NA'})
+
+    encrypted = f.encrypt(json.dumps(message).encode())
+
+    return encrypted
 
 @app.route("/generateKeys", methods=['POST'])
 def generateKeys():
