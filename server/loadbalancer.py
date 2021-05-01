@@ -14,7 +14,7 @@ config = load_configuration('loadbalancer.yaml')
 register = transform_backends_from_config(config)
 
 @loadbalancer.route('/')
-@loadbalancer.route('/<path>')
+@loadbalancer.route('/<path>', methods=['POST', 'GET'])
 def router(path='/'):
     updated_register = healthcheck(register)
 
@@ -23,7 +23,17 @@ def router(path='/'):
     if not healthy_server:
         return 'No backend servers available.', 503
 
-    response = requests.get('http://' + healthy_server.endpoint + '/' + path)
+    data = request.data
+    headers = request.headers
+    args = request.args
+
+    path = request.full_path
+    url = 'http://' + healthy_server.endpoint + path
+
+    if request.method == 'POST':
+        response = requests.post(url, data = data, headers = headers)
+    elif request.method == 'GET':
+        response = requests.get(url, data = data, headers = headers)
 
     return response.content, response.status_code
 

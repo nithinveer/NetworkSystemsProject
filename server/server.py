@@ -10,13 +10,14 @@ from cryptography.hazmat.primitives import serialization
 import os, json
 import server_helper as helper
 import server_config as cfg
+import sys
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
     return jsonify(
-        message=f'This is the {os.environ["APP"]} application home page.',
+        message=f'This is the server application home page.',
         server=request.base_url,
     )
 
@@ -89,12 +90,12 @@ def receivePubKey():
 
 @app.route('/cpuUsage')
 def cpu():
-	cpu_usage = psutil.cpu_percent()
+    cpu_usage = psutil.cpu_percent()
     return str(cpu_usage)
 
 @app.route('/memoryUsage')
 def memory():
-	memory_usage = psutil.virtual_memory().percent/100
+    memory_usage = psutil.virtual_memory().percent/100
     return str(memory_usage)
 
 @app.route('/healthcheck')
@@ -102,4 +103,5 @@ def healthcheck():
     return 'OK'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    port = sys.argv[1]
+    app.run(host='0.0.0.0', port=port)
