@@ -7,16 +7,21 @@ class Server:
         self.healthy = True
         self.timeout = 1
         self.scheme = 'http://'
+        self.status = 0
 
     def healthcheck_and_update_status(self):
         try:
-            print(self.scheme + self.endpoint + self.path)
             response = requests.get(self.scheme + self.endpoint + self.path, timeout=self.timeout)
-            print(response)
             if response.ok:
                 self.healthy = True
+
+                cpu_usage = requests.get(self.scheme + self.endpoint + '/cpuUsage', timeout=self.timeout).content
+                memory_usage = requests.get(self.scheme + self.endpoint + '/memoryUsage', timeout=self.timeout).content
+
+                self.status = 0.5*(float(cpu_usage) + float(memory_usage))
             else:
                 self.healthy = False
+
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             self.healthy = False
 

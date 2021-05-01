@@ -8,30 +8,24 @@ from utils import (
     transform_backends_from_config,
 )
 
-
 loadbalancer = Flask(__name__)
 
 config = load_configuration('loadbalancer.yaml')
 register = transform_backends_from_config(config)
 
-
 @loadbalancer.route('/')
 @loadbalancer.route('/<path>')
 def router(path='/'):
     updated_register = healthcheck(register)
-    host_header = request.headers['Host']
-    for entry in config['hosts']:
-        if host_header == entry['host']:
-            healthy_server = get_healthy_server(entry['host'], updated_register)
-            if not healthy_server:
-                return 'No backend servers available.', 503
-            response = requests.get(f'http://{healthy_server.endpoint}')
-            return response.content, response.status_code
-    for entry in config['paths']:
-        if ('/' + path) == entry['path']:
-            healthy_server = get_healthy_server(entry['path'], register)
-            if not healthy_server:
-                return 'No backend servers available.', 503
-            response = requests.get(f'http://{healthy_server.endpoint}')
-            return response.content, response.status_code
-    return 'Not Found', 404
+
+    healthy_server = get_healthy_server(register)
+
+    if not healthy_server:
+        return 'No backend servers available.', 503
+
+    response = requests.get('http://' + healthy_server.endpoint + '/' + path)
+
+    return response.content, response.status_code
+
+if __name__ == '__main__':
+    loadbalancer.run(host='0.0.0.0')
