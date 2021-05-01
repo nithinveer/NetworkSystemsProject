@@ -24,7 +24,7 @@ def send_msg(_id, data):
 
     f = Fernet(key)
     encrypted = f.encrypt(message)
-    response = requests.post(url='http://127.0.0.1:5000/shareData?_id={}'.format(_id), data=encrypted,
+    response = requests.post(url='{}/shareData?_id={}'.format(cfg.server_url, _id), data=encrypted,
                              headers=cfg.post_octect_headers)
     print(response)
 

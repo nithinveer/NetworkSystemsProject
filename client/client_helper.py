@@ -62,7 +62,7 @@ def transmit_publicKey(_id):
     request_payload = {}
     request_payload['msg'] = encrypted_contents
     request_payload['_id'] = _id
-    response = post(url='http://127.0.0.1:5000/receivePubKey', data=json.dumps(request_payload),
+    response = post(url='{}/receivePubKey'.format(cfg.server_url), data=json.dumps(request_payload),
                     headers=cfg.post_octect_headers).json()
 
     decrypt_message(response['msg'], _id)
