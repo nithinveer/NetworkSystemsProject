@@ -11,10 +11,12 @@ import os, json
 import server_helper as helper
 import server_config as cfg
 import sys
+import redis
 
 app = Flask(__name__)
 f = open('student_data.json',)
 student_data = json.load(f)
+store = redis.Redis(host='35.223.24.73', port=6379, password='networksystems')
 
 @app.route('/')
 def home():
@@ -28,6 +30,8 @@ def shareData():
     data = request.data
     print(type(data), data)
     _id = request.args.get('_id')
+
+    helper.redis_to_file(store, '{}.key'.format(_id))
     file = open('{}/{}.key'.format(cfg.keys_folder, _id), 'rb')  # Open the file as wb to read bytes
     key = file.read()  # The key will be type bytes
     file.close()
@@ -72,6 +76,8 @@ def generateKeys():
         with open('{}/pr1-{}.pem'.format(cfg.keys_folder, data['_id']), 'wb') as f:
             f.write(pem)
 
+        helper.file_to_redis(store, 'pr1-{}.pem'.format(data['_id']))
+
         pem = public_key.public_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -79,6 +85,9 @@ def generateKeys():
         app.config['keys_dir'] = os.getcwd()
         with open('{}/pu1-{}.pem'.format(cfg.keys_folder, data['_id']), 'wb') as f:
             f.write(pem)
+
+        helper.file_to_redis(store, 'pu1-{}.pem'.format(data['_id']))
+
         try:
             return send_from_directory(app.config["keys_dir"],
                                        filename='{}/pu1-{}.pem'.format(cfg.keys_folder, data['_id']),
@@ -96,9 +105,9 @@ def receivePubKey():
     my_json = data.decode('utf8').replace("'", '"')
     print(my_json)
     data = json.loads(my_json)
-    helper.decrypt_message(data)
-    helper.symetricKey_generation(data['_id'])
-    response_payload = helper.transmit_symetricKey(data['_id'])
+    helper.decrypt_message(store, data)
+    helper.symetricKey_generation(store, data['_id'])
+    response_payload = helper.transmit_symetricKey(store, data['_id'])
     return jsonify(response_payload), 200
 
 @app.route('/cpuUsage')

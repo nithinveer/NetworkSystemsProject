@@ -4,13 +4,33 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.fernet import Fernet
 import server_config as cfg
 
+def redis_to_file(store, key):
 
-def transmit_symetricKey(_id):
+    content = store.get(key)
+    print("from store:\n", content)
+    f = open('{}/{}'.format(cfg.keys_folder, key), "wb")
+    f.write(content)
+    f.close()
+
+def file_to_redis(store, key):
+
+    f = open('{}/{}'.format(cfg.keys_folder, key), "rb")
+    content = f.read()
+    f.close()
+    print("from file:\n", content)
+    store.set(key, content)
+
+def transmit_symetricKey(store, _id):
+
+    redis_to_file(store, 'pu2-{}.pem'.format(_id))
+
     with open('{}/pu2-{}.pem'.format(cfg.keys_folder, _id), "rb") as key_file:
         public_key = serialization.load_pem_public_key(
             key_file.read(),
             backend=default_backend()
         )
+
+    redis_to_file(store, '{}.key'.format(_id))
     msg_contents = []
     f = open('{}/{}.key'.format(cfg.keys_folder, _id), 'rb')
     while True:
@@ -40,8 +60,10 @@ def transmit_symetricKey(_id):
     return request_payload
 
 
-def decrypt_message(encypted_msg):
+def decrypt_message(store, encypted_msg):
     orginal_msg = []
+    
+    redis_to_file(store, 'pr1-{}.pem'.format(encypted_msg['_id']))
     for each_chunk in encypted_msg['msg']:
         with open('{}/pr1-{}.pem'.format(cfg.keys_folder, encypted_msg['_id']), "rb") as key_file:
             private_key = serialization.load_pem_private_key(
@@ -64,9 +86,12 @@ def decrypt_message(encypted_msg):
         f.write(each_)
     f.close()
 
+    file_to_redis(store, 'pu2-{}.pem'.format(encypted_msg['_id']))
 
-def symetricKey_generation(_id):
+def symetricKey_generation(store, _id):
     key = Fernet.generate_key()
     file = open('{}/{}.key'.format(cfg.keys_folder, _id), 'wb')  # Open the file as wb to write bytes
     file.write(key)  # The key is type bytes still
     file.close()
+
+    file_to_redis(store, '{}.key'.format(_id))
