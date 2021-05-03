@@ -12,11 +12,12 @@ import server_helper as helper
 import server_config as cfg
 import sys
 import redis
+import zlib
 
 app = Flask(__name__)
 f = open('student_data.json',)
 student_data = json.load(f)
-store = redis.Redis(host='35.223.24.73', port=6379, password='networksystems')
+store = redis.Redis(host='35.224.22.211', port=6379, password='networksystems')
 
 @app.route('/')
 def home():
@@ -41,14 +42,17 @@ def shareData():
 
     message = None
 
-    for i in student_data['student_details']:
-        if i['student_id'] == arg:
-            message = i
+    for student in student_data['student_details']:
+        if student['student_id'] == arg:
+            message = student
     
     if message == None:
         message = jsonify({'name': 'NA', 'major': 'NA', 'email': 'NA'})
 
-    encrypted = f.encrypt(json.dumps(message).encode())
+    response = json.dumps(message).encode()
+    response = zlib.compress(response)
+
+    encrypted = f.encrypt(response)
 
     return encrypted
 

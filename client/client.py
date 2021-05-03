@@ -6,6 +6,8 @@ import client_helper as helper
 import os.path
 import uuid
 import json
+import zlib
+import sys
 
 def send_msg(_id, data):
     # Check the Keys Directory
@@ -29,8 +31,12 @@ def send_msg(_id, data):
                              headers=cfg.post_octect_headers)
     print(response)
 
-    decrypted = f.decrypt(response.text.encode())
-    res = json.loads(decrypted.decode())
+    res = f.decrypt(response.text.encode())
+    print(sys.getsizeof(res))
+    res = zlib.decompress(res)
+    res = res.decode()
+    print(sys.getsizeof(res))
+    res = json.loads(res)
 
     print(res)
 
