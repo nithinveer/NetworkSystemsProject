@@ -8,6 +8,8 @@ import uuid
 import json
 import zlib
 import sys
+import time
+from getmac import get_mac_address as gma
 
 def send_msg(_id, data):
     # Check the Keys Directory
@@ -27,8 +29,12 @@ def send_msg(_id, data):
 
     f = Fernet(key)
     encrypted = f.encrypt(message)
+
     response = requests.post(url='{}/shareData?_id={}'.format(cfg.server_url, _id), data=encrypted,
                              headers=cfg.post_octect_headers)
+
+    print("encrypted request sent to the server")
+
     print(response)
 
     res = f.decrypt(response.text.encode())
@@ -41,7 +47,14 @@ def send_msg(_id, data):
     print(res)
 
 if __name__ == '__main__':
-    current_machine_id = str(uuid.uuid4())
+    current_machine_id = str(gma())
     data = {}
     data['msg'] = "23456"
+
+    start_time = time.time()
+
     send_msg(current_machine_id, data)
+
+    end_time = time.time()
+
+    print(end_time - start_time)

@@ -20,11 +20,13 @@ def get_healthy_server(register):
         return None
 
 def healthcheck(register):
+    print("healthcheck")
     for server in register:
         server.healthcheck_and_update_status()
     return register
 
 def least_connections(servers):
+    print("find server")
     if not servers:
         return None
     return min(servers, key=lambda x: x.status)

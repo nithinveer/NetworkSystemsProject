@@ -23,6 +23,8 @@ def create_keys(_id):
     with open('{}/pr2-{}.pem'.format(cfg.keys_folder, _id), 'wb') as f:
         f.write(pem)
 
+    print("creating private key 2")
+
     pem = public_key.public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -31,6 +33,7 @@ def create_keys(_id):
     with open('{}/pu2-{}.pem'.format(cfg.keys_folder, _id), 'wb') as f:
         f.write(pem)
 
+    print("creating public key 2")
 
 def transmit_publicKey(_id):
     with open('{}/pu1-{}.pem'.format(cfg.keys_folder, _id), "rb") as key_file:
@@ -62,6 +65,9 @@ def transmit_publicKey(_id):
     request_payload = {}
     request_payload['msg'] = encrypted_contents
     request_payload['_id'] = _id
+
+    print("transmitting encrypted public key 2 to server using public key 1")
+
     response = post(url='{}/receivePubKey'.format(cfg.server_url), data=json.dumps(request_payload),
                     headers=cfg.post_octect_headers).json()
 
@@ -69,6 +75,9 @@ def transmit_publicKey(_id):
 
 
 def decrypt_message(encypted_msg, _id):
+
+    print("received encrypted symmetric key from server")
+
     orginal_msg = []
     for each_chunk in encypted_msg:
         with open('{}/pr2-{}.pem'.format(cfg.keys_folder, _id), "rb") as key_file:
@@ -87,16 +96,21 @@ def decrypt_message(encypted_msg, _id):
             )
             orginal_msg.append(original_message)
     f = open('{}/{}.key'.format(cfg.keys_folder, _id), 'w+b')
+
+    print("decrypted symmetric key using private key 2")
+
     for each_ in orginal_msg:
         f.write(each_)
     f.close()
 
 
 def get_keys(_id):
+    print("requesting server to generate keys...")
     request_payload = '{"_id":"' + _id + '"}'
     response = post(url='{}/generateKeys'.format(cfg.server_url), data=request_payload, headers=cfg.post_json_headers)
     if response.status_code == 200:
         with open('{}/pu1-{}.pem'.format(cfg.keys_folder, _id), 'wb') as f:
             f.write(response.content)
+    print("received Public Key 1 from server")
     create_keys(_id)
     transmit_publicKey(_id)

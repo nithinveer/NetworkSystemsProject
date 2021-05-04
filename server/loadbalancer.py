@@ -30,6 +30,8 @@ def router(path='/'):
     path = request.full_path
     url = 'http://' + healthy_server.endpoint + path
 
+    print("sending request " + path + " to ", str(healthy_server.endpoint))
+
     if request.method == 'POST':
         response = requests.post(url, data = data, headers = headers)
     elif request.method == 'GET':
