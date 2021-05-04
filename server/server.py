@@ -60,7 +60,7 @@ def shareData():
 def generateKeys():
     try:
         data = request.get_json()
-        print('Received Request for the _id {}'.format(data['_id']))
+        print('Received Request for the _id {} to generate keys'.format(data['_id']))
         private_key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048,
@@ -80,6 +80,8 @@ def generateKeys():
         with open('{}/pr1-{}.pem'.format(cfg.keys_folder, data['_id']), 'wb') as f:
             f.write(pem)
 
+        print("generated private key 1")
+
         helper.file_to_redis(store, 'pr1-{}.pem'.format(data['_id']))
 
         pem = public_key.public_bytes(
@@ -90,9 +92,12 @@ def generateKeys():
         with open('{}/pu1-{}.pem'.format(cfg.keys_folder, data['_id']), 'wb') as f:
             f.write(pem)
 
+        print("generated public key 1")
+
         helper.file_to_redis(store, 'pu1-{}.pem'.format(data['_id']))
 
         try:
+            print("sharing public key 1 to client")
             return send_from_directory(app.config["keys_dir"],
                                        filename='{}/pu1-{}.pem'.format(cfg.keys_folder, data['_id']),
                                        as_attachment=True)
@@ -107,9 +112,10 @@ def generateKeys():
 def receivePubKey():
     data = request.data
     my_json = data.decode('utf8').replace("'", '"')
-    print(my_json)
+    print("received encrypted public key 2")
     data = json.loads(my_json)
     helper.decrypt_message(store, data)
+    print("decryted public key 2 using private key 1")
     helper.symetricKey_generation(store, data['_id'])
     response_payload = helper.transmit_symetricKey(store, data['_id'])
     return jsonify(response_payload), 200

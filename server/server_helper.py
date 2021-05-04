@@ -14,7 +14,6 @@ def redis_to_file(store, key):
         dirPath = os.path.join(curr_directory, cfg.keys_folder)
         os.mkdir(dirPath)
 
-    print("from store:\n", content)
     f = open('{}/{}'.format(cfg.keys_folder, key), "wb")
     f.write(content)
     f.close()
@@ -29,10 +28,11 @@ def file_to_redis(store, key):
     f = open('{}/{}'.format(cfg.keys_folder, key), "rb")
     content = f.read()
     f.close()
-    print("from file:\n", content)
     store.set(key, content)
 
 def transmit_symetricKey(store, _id):
+
+    print("encrypting symmetric key using public key 2")
 
     redis_to_file(store, 'pu2-{}.pem'.format(_id))
 
@@ -92,7 +92,9 @@ def decrypt_message(store, encypted_msg):
                 )
             )
             orginal_msg.append(original_message)
-    print(orginal_msg)
+    
+    print("request decrypted")
+
     f = open('{}/pu2-{}.pem'.format(cfg.keys_folder, encypted_msg['_id']), 'w+b')
     for each_ in orginal_msg:
         f.write(each_)
@@ -101,6 +103,7 @@ def decrypt_message(store, encypted_msg):
     file_to_redis(store, 'pu2-{}.pem'.format(encypted_msg['_id']))
 
 def symetricKey_generation(store, _id):
+    print("generating symmetric key")
     key = Fernet.generate_key()
     file = open('{}/{}.key'.format(cfg.keys_folder, _id), 'wb')  # Open the file as wb to write bytes
     file.write(key)  # The key is type bytes still
