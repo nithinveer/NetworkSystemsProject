@@ -13,12 +13,14 @@ import server_config as cfg
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def home():
     return jsonify(
         message=f'This is the {os.environ["APP"]} application home page.',
         server=request.base_url,
     )
+
 
 @app.route("/shareData", methods=['POST'])
 def shareData():
@@ -87,19 +89,27 @@ def receivePubKey():
     response_payload = helper.transmit_symetricKey(data['_id'])
     return jsonify(response_payload), 200
 
+
 @app.route('/cpuUsage')
 def cpu():
-	cpu_usage = psutil.cpu_percent()
-    return str(cpu_usage)
+    cpu_usage = psutil.cpu_percent()
+
+
+return str(cpu_usage)
+
 
 @app.route('/memoryUsage')
 def memory():
-	memory_usage = psutil.virtual_memory().percent/100
-    return str(memory_usage)
+    memory_usage = psutil.virtual_memory().percent / 100
+
+
+return str(memory_usage)
+
 
 @app.route('/healthcheck')
 def healthcheck():
     return 'OK'
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

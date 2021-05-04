@@ -2,10 +2,12 @@ from loadbalancer import loadbalancer
 import pytest
 import json
 
+
 @pytest.fixture
 def client():
-	with loadbalancer.test_client() as client:
-		yield client
+    with loadbalancer.test_client() as client:
+        yield client
+
 
 def test_host_routing_mango(client):
     result = client.get('/', headers={'Host': 'www.mango.com'})
@@ -38,11 +40,13 @@ def test_path_routing_mango(client):
     assert 'This is the mango application.' in data['message']
     assert data['server'] in ['http://localhost:8082/', 'http://localhost:8081/']
 
+
 def test_path_routing_apple(client):
     result = client.get('/apple')
     data = json.loads(result.data.decode())
     assert 'This is the apple application.' in data['message']
     assert data['server'] in ['http://localhost:9082/', 'http://localhost:9081/']
+
 
 def test_path_routing_orange(client):
     result = client.get('/orange')

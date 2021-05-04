@@ -11,6 +11,7 @@ import sys
 import time
 from getmac import get_mac_address as gma
 
+
 def send_msg(_id, data):
     # Check the Keys Directory
     curr_directory = os.getcwd()
@@ -46,8 +47,9 @@ def send_msg(_id, data):
 
     print(res)
 
+
 if __name__ == '__main__':
-    current_machine_id = str(gma())
+    current_machine_id = str(gma()).replace(':', '_')
     data = {}
     data['msg'] = "23456"
 

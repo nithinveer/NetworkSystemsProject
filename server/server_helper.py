@@ -5,8 +5,8 @@ from cryptography.fernet import Fernet
 import server_config as cfg
 import os
 
-def redis_to_file(store, key):
 
+def redis_to_file(store, key):
     content = store.get(key)
 
     curr_directory = os.getcwd()
@@ -18,8 +18,8 @@ def redis_to_file(store, key):
     f.write(content)
     f.close()
 
-def file_to_redis(store, key):
 
+def file_to_redis(store, key):
     curr_directory = os.getcwd()
     if not os.path.exists(cfg.keys_folder):
         dirPath = os.path.join(curr_directory, cfg.keys_folder)
@@ -30,8 +30,8 @@ def file_to_redis(store, key):
     f.close()
     store.set(key, content)
 
-def transmit_symetricKey(store, _id):
 
+def transmit_symetricKey(store, _id):
     print("encrypting symmetric key using public key 2")
 
     redis_to_file(store, 'pu2-{}.pem'.format(_id))
@@ -74,7 +74,7 @@ def transmit_symetricKey(store, _id):
 
 def decrypt_message(store, encypted_msg):
     orginal_msg = []
-    
+
     redis_to_file(store, 'pr1-{}.pem'.format(encypted_msg['_id']))
     for each_chunk in encypted_msg['msg']:
         with open('{}/pr1-{}.pem'.format(cfg.keys_folder, encypted_msg['_id']), "rb") as key_file:
@@ -92,7 +92,7 @@ def decrypt_message(store, encypted_msg):
                 )
             )
             orginal_msg.append(original_message)
-    
+
     print("request decrypted")
 
     f = open('{}/pu2-{}.pem'.format(cfg.keys_folder, encypted_msg['_id']), 'w+b')
@@ -101,6 +101,7 @@ def decrypt_message(store, encypted_msg):
     f.close()
 
     file_to_redis(store, 'pu2-{}.pem'.format(encypted_msg['_id']))
+
 
 def symetricKey_generation(store, _id):
     print("generating symmetric key")

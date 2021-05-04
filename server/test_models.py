@@ -2,10 +2,12 @@ import pytest
 import responses
 from models import Server
 
+
 @pytest.fixture
 def server():
     server = Server('localhost:5555')
     yield server
+
 
 @responses.activate
 def test_server_healthcheck_pass(server):

@@ -1,5 +1,6 @@
 import requests
 
+
 class Server:
     def __init__(self, endpoint, path='/healthcheck'):
         self.endpoint = endpoint
@@ -18,7 +19,7 @@ class Server:
                 cpu_usage = requests.get(self.scheme + self.endpoint + '/cpuUsage', timeout=self.timeout).content
                 memory_usage = requests.get(self.scheme + self.endpoint + '/memoryUsage', timeout=self.timeout).content
 
-                self.status = 0.5*(float(cpu_usage) + float(memory_usage))
+                self.status = 0.5 * (float(cpu_usage) + float(memory_usage))
             else:
                 self.healthy = False
 

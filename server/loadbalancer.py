@@ -13,6 +13,7 @@ loadbalancer = Flask(__name__)
 config = load_configuration('loadbalancer.yaml')
 register = transform_backends_from_config(config)
 
+
 @loadbalancer.route('/')
 @loadbalancer.route('/<path>', methods=['POST', 'GET'])
 def router(path='/'):
@@ -33,11 +34,12 @@ def router(path='/'):
     print("sending request " + path + " to ", str(healthy_server.endpoint))
 
     if request.method == 'POST':
-        response = requests.post(url, data = data, headers = headers)
+        response = requests.post(url, data=data, headers=headers)
     elif request.method == 'GET':
-        response = requests.get(url, data = data, headers = headers)
+        response = requests.get(url, data=data, headers=headers)
 
     return response.content, response.status_code
+
 
 if __name__ == '__main__':
     loadbalancer.run(host='0.0.0.0')

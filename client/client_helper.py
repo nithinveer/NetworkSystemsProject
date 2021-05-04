@@ -35,6 +35,7 @@ def create_keys(_id):
 
     print("creating public key 2")
 
+
 def transmit_publicKey(_id):
     with open('{}/pu1-{}.pem'.format(cfg.keys_folder, _id), "rb") as key_file:
         public_key = serialization.load_pem_public_key(
@@ -75,7 +76,6 @@ def transmit_publicKey(_id):
 
 
 def decrypt_message(encypted_msg, _id):
-
     print("received encrypted symmetric key from server")
 
     orginal_msg = []

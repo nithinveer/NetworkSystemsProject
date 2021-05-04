@@ -15,9 +15,10 @@ import redis
 import zlib
 
 app = Flask(__name__)
-f = open('student_data.json',)
+f = open('student_data.json', )
 student_data = json.load(f)
 store = redis.Redis(host='35.224.22.211', port=6379, password='networksystems')
+
 
 @app.route('/')
 def home():
@@ -25,6 +26,7 @@ def home():
         message=f'This is the server application home page.',
         server=request.base_url,
     )
+
 
 @app.route("/shareData", methods=['POST'])
 def shareData():
@@ -45,7 +47,7 @@ def shareData():
     for student in student_data['student_details']:
         if student['student_id'] == arg:
             message = student
-    
+
     if message == None:
         message = jsonify({'name': 'NA', 'major': 'NA', 'email': 'NA'})
 
@@ -55,6 +57,7 @@ def shareData():
     encrypted = f.encrypt(response)
 
     return encrypted
+
 
 @app.route("/generateKeys", methods=['POST'])
 def generateKeys():
@@ -120,19 +123,23 @@ def receivePubKey():
     response_payload = helper.transmit_symetricKey(store, data['_id'])
     return jsonify(response_payload), 200
 
+
 @app.route('/cpuUsage')
 def cpu():
     cpu_usage = psutil.cpu_percent()
     return str(cpu_usage)
 
+
 @app.route('/memoryUsage')
 def memory():
-    memory_usage = psutil.virtual_memory().percent/100
+    memory_usage = psutil.virtual_memory().percent / 100
     return str(memory_usage)
+
 
 @app.route('/healthcheck')
 def healthcheck():
     return 'OK'
+
 
 if __name__ == '__main__':
     port = sys.argv[1]

@@ -2,6 +2,7 @@ import yaml
 from models import Server
 from utils import transform_backends_from_config, get_healthy_server, healthcheck, least_connections
 
+
 def test_transform_backends_from_config():
     input = yaml.safe_load('''
         hosts:
@@ -34,6 +35,7 @@ def test_transform_backends_from_config():
     assert output['/apple'][0] == Server('localhost:9081')
     assert output['/apple'][1] == Server('localhost:9082')
 
+
 def test_get_healthy_server():
     healthy_server = Server('localhost:8081')
     unhealthy_server = Server('localhost:8082')
@@ -49,6 +51,7 @@ def test_get_healthy_server():
     assert get_healthy_server('/mango', register) == healthy_server
     assert get_healthy_server('/apple', register) is None
 
+
 def test_healthcheck():
     config = yaml.safe_load('''
         hosts:
@@ -63,15 +66,17 @@ def test_healthcheck():
     ''')
 
     register = healthcheck(transform_backends_from_config(config))
-    
+
     assert register['www.apple.com'][0].healthy
     assert not register['www.apple.com'][1].healthy
     assert register['www.mango.com'][0].healthy
     assert not register['www.mango.com'][1].healthy
 
+
 def test_least_connections_empty_list():
     result = least_connections([])
     assert result == None
+
 
 def test_least_connections():
     backend1 = Server('localhost:8081')
