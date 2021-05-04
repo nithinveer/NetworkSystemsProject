@@ -17,7 +17,7 @@ import zlib
 app = Flask(__name__)
 f = open('student_data.json',)
 student_data = json.load(f)
-store = redis.Redis(host='35.224.22.211', port=6379, password='networksystems')
+store = redis.Redis(host='104.155.156.233', port=6379, password='networksystems')
 
 @app.route('/')
 def home():
