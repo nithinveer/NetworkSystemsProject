@@ -8,6 +8,7 @@ import uuid
 import json
 import zlib
 import sys
+import time
 
 def send_msg(_id, data):
     # Check the Keys Directory
@@ -44,4 +45,11 @@ if __name__ == '__main__':
     current_machine_id = str(uuid.uuid4())
     data = {}
     data['msg'] = "23456"
+
+    start_time = time.time()
+
     send_msg(current_machine_id, data)
+
+    end_time = time.time()
+
+    print(end_time - start_time)
