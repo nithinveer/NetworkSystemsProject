@@ -1,0 +1,62 @@
+{
+	"student_details": [
+		{
+			"student_id": "12345",
+			"name": "Sitesh Ranjan",
+			"email": "sitesh.ranjan@colorado.edu",
+			"major": "Computer Science"
+		},
+		{
+			"student_id": "23456",
+			"name": "Srinivas Baskar",
+			"email": "srinivas.baskar@colorado.edu",
+			"major": "Computer Science",
+			"name1": "Srinivas Baskar",
+			"email1": "srinivas.baskar@colorado.edu",
+			"major1": "Computer Science",
+			"name2": "Srinivas Baskar",
+			"email2": "srinivas.baskar@colorado.edu",
+			"major2": "Computer Science",
+			"name3": "Srinivas Baskar",
+			"email3": "srinivas.baskar@colorado.edu",
+			"major3": "Computer Science",
+			"name4": "Srinivas Baskar",
+			"email4": "srinivas.baskar@colorado.edu",
+			"major4": "Computer Science",
+			"name5": "Srinivas Baskar",
+			"email5": "srinivas.baskar@colorado.edu",
+			"major5": "Computer Science",
+			"name6": "Srinivas Baskar",
+			"email6": "srinivas.baskar@colorado.edu",
+			"major6": "Computer Science",
+			"name7": "Srinivas Baskar",
+			"email7": "srinivas.baskar@colorado.edu",
+			"major7": "Computer Science",
+			"name8": "Srinivas Baskar",
+			"email8": "srinivas.baskar@colorado.edu",
+			"major8": "Computer Science",
+			"name9": "Srinivas Baskar",
+			"email9": "srinivas.baskar@colorado.edu",
+			"major9": "Computer Science",
+			"name10": "Srinivas Baskar",
+			"email10": "srinivas.baskar@colorado.edu",
+			"major10": "Computer Science",
+			"name11": "Srinivas Baskar",
+			"email11": "srinivas.baskar@colorado.edu",
+			"major11": "Computer Science"
+		},
+		{
+			"student_id": "34567",
+			"name": "Nithin Kankati",
+			"email": "nithin.kankati@colorado.edu",
+			"major": "Computer Science"
+		},
+		{
+			"student_id": "45678",
+			"name": "Chanheum Park",
+			"email": "chpa8095@colorado.edu",
+			"major": "Computer Science"
+		}
+
+	]
+}

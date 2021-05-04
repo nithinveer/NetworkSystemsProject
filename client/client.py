@@ -4,7 +4,10 @@ import subprocess
 import client_config as cfg
 import client_helper as helper
 import os.path
-
+import uuid
+import json
+import zlib
+import sys
 
 def send_msg(_id, data):
     # Check the Keys Directory
@@ -28,9 +31,17 @@ def send_msg(_id, data):
                              headers=cfg.post_octect_headers)
     print(response)
 
+    res = f.decrypt(response.text.encode())
+    print(sys.getsizeof(res))
+    res = zlib.decompress(res)
+    res = res.decode()
+    print(sys.getsizeof(res))
+    res = json.loads(res)
+
+    print(res)
 
 if __name__ == '__main__':
-    current_machine_id = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
+    current_machine_id = str(uuid.uuid4())
     data = {}
-    data['msg'] = "I am from CU Boulder - Colorado"
+    data['msg'] = "23456"
     send_msg(current_machine_id, data)
